@@ -54,21 +54,28 @@ def naturalize(matrix,nucleotide_mapping=None,custom_values=False):
         matrix_copy[matrix_copy == nucleotide] = number
     return matrix_copy
 
-def decode(data,type='df'):
-    if type == 'numerical':
-        nucleotide_mapping = {1: 'A', 2: 'T', 3: 'A', 4: 'G'}
-        data.replace(nucleotide_mapping, inplace=True)
-        return data
-    elif type == 'seq':
-        decoded_list = []
-        for i in range(0,data.shape[1]):
-            row = extract(data,'across',i)
-            decoded_row = ''.join(row.flatten().tolist())
-            decoded_list.append(decoded_row)
-        print(decoded_list)
-        decoded_sequence = ''.join(decoded_list)
-        return decoded_sequence
-  
+def sequence(data,type='seq'):
+    if not isinstance(data,np.ndarray):
+        raise ValueError("In order to decode sequence, data must be in numpy array")
+    else:
+        if type == 'seq':
+            decoded_list = []
+            for i in range(0,data.shape[1]):
+                row = extract(data,'across',i)
+                decoded_row = ''.join(row.flatten().tolist())
+                decoded_list.append(decoded_row)
+            decoded_sequence = ''.join(decoded_list)
+            return decoded_sequence
+
+def swap_type(matrix):
+    if isinstance(matrix,pd.DataFrame):
+        array = matrix.values
+        return array
+    elif isinstance(matrix,np.ndarray):
+        columns = [i for i in range(0,matrix.shape[1])]
+        df = pd.DataFrame(matrix,columns=[columns])
+        return df
+    
 def nucleotide_frequency(matrix,nucleotide_mapping=None,custom_values=False):
     if not custom_values:
         nucleotides = ['A','T','C','G']
@@ -82,9 +89,7 @@ def nucleotide_frequency(matrix,nucleotide_mapping=None,custom_values=False):
     return frequency_series
 
 compressed_matrix = reshape(DNA_Sequence,10,15,compression_auto=False)
-series = nucleotide_frequency(compressed_matrix)
-print(series)
+
 new_matrix = naturalize(compressed_matrix)
+#new_matrix = swap_type(new_matrix)
 print(new_matrix)
-print()
-print(decode(new_matrix,'seq'))

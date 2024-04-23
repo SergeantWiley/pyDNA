@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Launcher Page</title>
+    <style>
+        /* Add some basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .banner {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+        .nav {
+            background-color: #444;
+            padding: 10px;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .text-area {
+            flex: 1;
+            padding: 20px;
+        }
+        .output-box {
+            flex: 1;
+            background-color: black;
+            color: white;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 400px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="banner">
+    <h1>Launcher Page</h1>
+</div>
+
+<div class="nav">
+    <a href="/">Home</a>
+    <a href="/education/">Education</a>
+    <a href="/launcher/">Launcher</a>
+    <a href="#">Information</a>
+    <a href="#">Consul</a>
+    <a href="#">myDNA</a>
+</div>
+
+<div class="container">
+    <div class="text-area">
+        <!-- Large text area for user input -->
+        <h2>Type Here</h2>
+        <textarea id="userInput" placeholder="Type your Python code here..."></textarea>
+        <button onclick="processInput()">Execute</button>
+    </div>
+    <div class="output-box">
+        <!-- Output box to display processed content -->
+        <h2>Output</h2>
+        <div id="output"></div>
+    </div>
+</div>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js"></script>
+<script type="text/javascript">
+    async function main() {
+        let pyodide = await loadPyodide();
+        
+        window.processInput = async function() {
+            let userInput = "output = ''" + "\n" + "output2 = '2'" + "\n" + document.getElementById('userInput').value;
+            try {
+                let result = await pyodide.runPythonAsync(userInput);
+                displayOutput(result);
+            } catch (error) {
+                displayOutput("Error: " + error.toString());
+            }
+        };
+
+        function displayOutput(output) {
+            let outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = ''; // Clear previous output
+            
+            if (output === undefined) {
+                outputDiv.innerText = 'No output';
+                return;
+            }
+
+            if (typeof output === 'string' || typeof output === 'number' || typeof output === 'boolean') {
+                outputDiv.innerText = output.toString();
+                return;
+            }
+
+            if (Array.isArray(output)) {
+                output.forEach(item => {
+                    let p = document.createElement('p');
+                    p.innerText = item.toString();
+                    outputDiv.appendChild(p);
+                });
+                return;
+            }
+
+            if (typeof output === 'object' && output !== null) {
+                let keys = Object.keys(output);
+                if (keys.length > 0) {
+                    keys.forEach(key => {
+                        let p = document.createElement('p');
+                        p.innerText = `${key}: ${output[key]}`;
+                        outputDiv.appendChild(p);
+                    });
+                    return;
+                }
+            }
+
+            outputDiv.innerText = output.toString();
+        }
+
+    }
+    main();
+</script>
+
+</body>
+</html>
