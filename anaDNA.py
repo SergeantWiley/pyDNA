@@ -14,38 +14,47 @@ def dimension_auto(n):
         if len(n) % i == 0:
             factor = [i, len(n) // i]
             combinations.append(factor)
+        else:
+            print("No common Factors found. Most likely a prime number")
     #Finding the most balanced combination
     for factor in combinations:
         differences = abs(factor[0] - factor[1])
         optimal_dimensions.append(differences)
-    
+    # Find and return the smallest differences
     index = optimal_dimensions.index(min(optimal_dimensions))
     return combinations[index]
 
 def reshape(sequence,size_x=None,size_y=None,compression_auto=True):
+    #Convert a sequence (1D string) into a matrix
     if compression_auto:
+        #Auto find the best dimensions
         dimension1, dimension2 = dimension_auto(sequence)
         matrix = np.reshape(np.array(list(sequence)), (dimension1, dimension2))
         return matrix
     else:
+        #Make sure manaul sizes do equal the legnth
         if not size_x*size_y == len(sequence):
             raise ValueError(f"Dimensions {size_x} x {size_y} do not equal to {len(sequence)}")
         matrix = np.reshape(np.array(list(sequence)), (size_x, size_y))
         return matrix
 
 def extract(matrix,direction,value):
+    #Grab a row
     if direction == "across":
         row = matrix[:, value]
         row_matrix = np.reshape(row, (len(row), 1))
         return row_matrix
+    #Grab a column
     elif direction == "down":
         col = matrix[:, value]
         col_matrix = np.reshape(col, (len(col), 1))
         return col_matrix
     else:
+        #Invalid direction returns the right terms
         print("Invalid Direction. use 'down' for verticle and 'across' for horizontal")
 
 def naturalize(matrix,nucleotide_mapping=None,custom_values=False):
+    #convert the nucleotides into numerical numbers
     if not custom_values:
         nucleotide_mapping = {'A': 1, 'T': 2, 'C': 3, 'G': 4}
     # Create a copy of the matrix to avoid modifying the original matrix
@@ -68,14 +77,14 @@ def sequence(data,type='seq'):
             return decoded_sequence
 
 def swap_type(matrix):
-    if isinstance(matrix,pd.DataFrame):
-        array = matrix.values
+    if isinstance(matrix, pd.DataFrame):
+        array = matrix.to_numpy()
         return array
-    elif isinstance(matrix,np.ndarray):
-        columns = [i for i in range(0,matrix.shape[1])]
-        df = pd.DataFrame(matrix,columns=[columns])
+    elif isinstance(matrix, np.ndarray):
+        columns = [i for i in range(0, matrix.shape[1])]
+        df = pd.DataFrame(matrix, columns=columns)
         return df
-    
+
 def nucleotide_frequency(matrix,nucleotide_mapping=None,custom_values=False):
     if not custom_values:
         nucleotides = ['A','T','C','G']
@@ -90,6 +99,15 @@ def nucleotide_frequency(matrix,nucleotide_mapping=None,custom_values=False):
 
 compressed_matrix = reshape(DNA_Sequence,10,15,compression_auto=False)
 
+def reshape3D(DNA_Sequence,size_x,size_y,size_z):
+    if len(DNA_Sequence) == size_x*size_y*size_z:
+        pass
+    else:
+        raise ValueError(f"Dimensions {size_x} x {size_y} x {size_z} do not equal to {len(DNA_Sequence)}")
 new_matrix = naturalize(compressed_matrix)
 #new_matrix = swap_type(new_matrix)
+swapped = swap_type(new_matrix)
 print(new_matrix)
+print(swapped)
+swapped = swap_type(swapped)
+print(swapped)
