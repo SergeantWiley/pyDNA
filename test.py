@@ -1,6 +1,7 @@
 
-import random
-a = random.randrange(1,10)
+import secrets
+
+a = secrets.SystemRandom().randrange(1,10)
 print(a)
 option = input("Enter a number: ")
 option = int(option)
